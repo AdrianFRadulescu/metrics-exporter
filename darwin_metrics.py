@@ -12,38 +12,32 @@ INPUT_PACKETS_COUNT = Gauge('input_packets_count', 'Number of received packets')
 INPUT_ERRORS_COUNT = Gauge('input_error_count', 'Number of input errors')
 INPUT_SIZE_BYTES = Gauge('input_size_bytes', 'The size of the input')
 
-INPUT_PACKETS_COUNT_TOTAL = Gauge('input_packets_count_total', 'Total number of received packets')
-INPUT_ERRORS_COUNT_TOTAL = Gauge('input_error_count_total', 'Total number of input errors')
-INPUT_SIZE_BYTES_TOTAL = Gauge('input_size_bytes_total', 'Total size of the input')
+INPUT_PACKETS_COUNT_TOTAL = Counter('input_packets_count_total', 'Total number of received packets')
+INPUT_ERRORS_COUNT_TOTAL = Counter('input_error_count_total', 'Total number of input errors')
+INPUT_SIZE_BYTES_TOTAL = Counter('input_size_bytes_total', 'Total size of the input')
 
 
 OUTPUT_PACKETS_COUNT = Gauge('output_packets_count', 'Number of received packets')
 OUTPUT_ERRORS_COUNT = Gauge('output_error_count', 'Number of input errors')
 OUTPUT_SIZE_BYTES = Gauge('output_size_bytes', 'The size of the input')
 
-OUTPUT_PACKETS_COUNT_TOTAL = Gauge('output_packets_count_total', 'Total number of received packets')
-OUTPUT_ERRORS_COUNT_TOTAL = Gauge('output_error_count_total', 'Total number of input errors')
-OUTPUT_SIZE_BYTES_TOTAL = Gauge('output_size_bytes_total', 'Total size of the input')
+OUTPUT_PACKETS_COUNT_TOTAL = Counter('output_packets_count_total', 'Total number of received packets')
+OUTPUT_ERRORS_COUNT_TOTAL = Counter('output_error_count_total', 'Total number of input errors')
+OUTPUT_SIZE_BYTES_TOTAL = Counter('output_size_bytes_total', 'Total size of the input')
 
-NETSTAT_METRICS = [
+NETSTAT_METRICS = {
 
-    INPUT_PACKETS_COUNT,
-    INPUT_ERRORS_COUNT,
-    INPUT_SIZE_BYTES,
+    'Gauge': [
+        INPUT_PACKETS_COUNT, INPUT_ERRORS_COUNT, INPUT_SIZE_BYTES,
+        OUTPUT_PACKETS_COUNT, OUTPUT_ERRORS_COUNT, OUTPUT_SIZE_BYTES
+    ],
 
-    INPUT_PACKETS_COUNT_TOTAL,
-    INPUT_ERRORS_COUNT_TOTAL,
-    INPUT_SIZE_BYTES_TOTAL,
+    'Counter': [
+        INPUT_PACKETS_COUNT_TOTAL, INPUT_ERRORS_COUNT_TOTAL, INPUT_SIZE_BYTES_TOTAL,
+        OUTPUT_PACKETS_COUNT_TOTAL,OUTPUT_ERRORS_COUNT_TOTAL, OUTPUT_SIZE_BYTES_TOTAL
+    ]
 
-    OUTPUT_PACKETS_COUNT,
-    OUTPUT_ERRORS_COUNT,
-    OUTPUT_SIZE_BYTES,
-
-    OUTPUT_PACKETS_COUNT_TOTAL,
-    OUTPUT_ERRORS_COUNT_TOTAL,
-    OUTPUT_SIZE_BYTES_TOTAL
-
-]
+}
 
 
 # vm_stat metrics

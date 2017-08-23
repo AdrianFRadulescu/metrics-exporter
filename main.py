@@ -1,10 +1,12 @@
 from prometheus_client import start_http_server
 
 import darwin_metrics
+from pprint import pprint
+
 
 if __name__ == "__main__":
 
-    print darwin_metrics.NETSTAT_METRICS
+    pprint(darwin_metrics.NETSTAT_METRICS)
 
     start_http_server(8000)
 
