@@ -118,15 +118,35 @@ class IOStat(SysCmd):
         with self._lock:
             st = iter(self._stats)
             # update disk metrics
+            print self._stats
+            mv = []
             for disk in self._metrics[0]:
+
+                # KB/t update
                 self._metrics[0][disk][0].set(float(st.next()))
-                self._metrics[0][disk][1].inc(float(st.next()))
+                mv += [self._metrics[0][disk][0]._value.get()]
+                # tps update
+                tps = float(st.next())
+                self._metrics[0][disk][1].set(tps)
+                mv += [self._metrics[0][disk][1]._value.get()]
+                self._metrics[0][disk][2].inc(tps)
+
+                # MB/t update
+                mbpt = float(st.next())
+                self._metrics[0][disk][3].set(mbpt)
+                mv += [self._metrics[0][disk][3]._value.get()]
+                self._metrics[0][disk][4].inc(mbpt)
 
             # update cpu usage metrics
             for mode in ['us', 'sy', 'id']:
                 self._metrics[1].labels(mode=mode).set(float(st.next()))
+                mv += [self._metrics[1].labels(mode=mode)._value.get()]
+            # update cpu average load metrics
             for q in ['1m','5m','15m']:
                 self._metrics[2].labels(quantile=q).set(float(st.next()))
+                mv += [self._metrics[2].labels(quantile=q)._value.get()]
+
+            print mv
 
 
 class VMStat(SysCmd):

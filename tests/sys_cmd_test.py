@@ -1,6 +1,5 @@
 import unittest
 import system_commands
-import threading
 import time
 import darwin_metrics
 
@@ -82,6 +81,13 @@ class SysCmdTestCase(unittest.TestCase):
             self.assertTrue(t0 < ti, 'err1')
             self.assertLess(t0, ti, 'metrics were not updated')
             self.assertLess(ti, tf, 'Second update was not done')
+
+    def test_get_metrics(self):
+        """
+            Check if metrics a re in the right format
+        :return:
+        """
+        self.assertEqual(len(self.component_args['metrics']), self.cmd.get_metrics(), "Component's metrics are not properly transmitted")
 
 
 class NetStatTestCase(SysCmdTestCase):

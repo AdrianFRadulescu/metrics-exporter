@@ -89,11 +89,13 @@ for d in disks:
 
     DISK_TRANSFER_METRICS[d] = []
 
-    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfers', 'Disk transfers per second')]
+    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_kilobytes_per_transfer', 'Current transfer average size')]
+
+    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfers_count', 'Current number of disk transfers per second')]
     DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfers_total', 'Total number of disk transfers made')]
 
     DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfer_size_kilobytes', 'Size of transfer')]
-    DISK_TRANSFER_METRICS[d] += [Counter(d +'_transfer_size_bytes_total', 'Total nuber of transfered bytes')]
+    DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfer_size_bytes_total', 'Total number of transfered bytes')]
 
 
 # CPU
@@ -116,6 +118,5 @@ if __name__ == '__main__':
     #start_http_server(8000)
     # Generate some requests.
 
-    for i in IOSTAT_METRICS[0]:
-        print i
-    print
+    from pprint import pprint
+    pprint(IOSTAT_METRICS[0]['disk0'][1])
