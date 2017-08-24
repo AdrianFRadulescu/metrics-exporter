@@ -30,41 +30,69 @@ class SysCmd(threading.Thread):
         :param sleep_time:
         """
         threading.Thread.__init__(self)
-        self.name = name
-        self.stats = None
-        self.metrics = metrics
-        self.sleep_time = sleep_time
-        self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        self.headers = [self.process.stdout.readline(), self.process.stdout.readline()]
-        self.output_stream = self.process.stdout
-        self.lock = threading.RLock()
+        self._name = name
+        self._stats = None
+        self._metrics = metrics
+        self._last_update_time = time.time()
+        self._sleep_time = sleep_time
+        self._process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        self._headers = [self._process.stdout.readline(), self._process.stdout.readline()]
+        self._output_stream = self._process.stdout
+        self._lock = threading.RLock()
 
-    def _update_metrics(self):
-        pass
+    def run(self):
+
+        while getattr(self, 'do_run', True):
+            self._update_metrics()
+            self._last_update_time = time.time()
+            time.sleep(self._sleep_time)
+
+        self._process.terminate()
+        del self._process
+        del self._output_stream
+        del self._stats
+        self._metrics = None
 
     def _update_stats(self):
+        """
+            Updates the stats with the values outputed by the process
+        :return:
+        """
+        def __convert(val):
+            f = int if '.' not in val else float
+            return f(val[:-1]) * 1000 if val[-1] == 'K' else f(val)
+
+        line = 'input'
+        while 'input' in line or 'bytes' in line:
+            line = self._output_stream.readline()
+        self._stats = list(map(lambda x: __convert(x), line.split()))
+
+    def _update_metrics(self):
         pass
 
     # getters
 
     def get_output_stream(self):
-        return self.output_stream
+        return self._output_stream
 
     def get_metrics(self):
         self._update_metrics()
-        return self.metrics
+        return self._metrics
 
     def get_stats(self):
         self._update_stats()
-        return self.stats
+        return self._stats
 
     def get_sleep_time(self):
-        return self.sleep_time
+        return self._sleep_time
+
+    def get_last_update_time(self):
+        return self._last_update_time
 
     # setters
 
     def set_sleep_time(self, new_value):
-        self.sleep_time = new_value
+        self._sleep_time = new_value
 
 
 class IOStat(SysCmd):
@@ -84,7 +112,21 @@ class IOStat(SysCmd):
 
         SysCmd.__init__(self, cmd=cmd, name=name, metrics=metrics, sleep_time=sleep_time)
 
-        # initialize statistics parameters for every given metric
+    def _update_metrics(self):
+        self._update_stats()
+
+        with self._lock:
+            st = iter(self._stats)
+            # update disk metrics
+            for disk in self._metrics[0]:
+                self._metrics[0][disk][0].set(float(st.next()))
+                self._metrics[0][disk][1].inc(float(st.next()))
+
+            # update cpu usage metrics
+            for mode in ['us', 'sy', 'id']:
+                self._metrics[1].labels(mode=mode).set(float(st.next()))
+            for q in ['1m','5m','15m']:
+                self._metrics[2].labels(quantile=q).set(float(st.next()))
 
 
 class VMStat(SysCmd):
@@ -96,6 +138,16 @@ class VMStat(SysCmd):
     def __init__(self, cmd, name, metrics, sleep_time):
         SysCmd.__init__(self, cmd=cmd, name=name, metrics=metrics, sleep_time=sleep_time)
 
+    def _update_metrics(self):
+        self._update_stats()
+
+        with self._lock:
+            for m, st in zip(self._metrics, self._stats):
+                if 'Gauge' in str(type(m)):
+                    m.set(st)
+                elif 'Counter' in str(type(m)):
+                    m.inc(st)
+
 
 class NetStat(SysCmd):
     """
@@ -105,42 +157,16 @@ class NetStat(SysCmd):
 
     def __init__(self, cmd, name, metrics, sleep_time):
         SysCmd.__init__(self, cmd=cmd, name=name, metrics=metrics, sleep_time=sleep_time)
-
         self.stats = [0] * 6
-
-    def run(self):
-
-        while getattr(self, 'do_run', True):
-            with self.lock:
-                self._update_metrics()
-            #print 'running {}'.format(self.name)
-            time.sleep(self.sleep_time)
-
-        self.process.terminate()
-        del self.process
-        del self.output_stream
-        del self.stats
-        self.metrics = None
-
-    def _update_stats(self):
-        """
-            Read output stream of the followed process and update stats variable
-        :return:
-        """
-
-        line = 'input'
-        while 'input' in line or 'bytes' in line:
-            line = self.output_stream.readline()
-        self.stats = list(map(lambda x: int(x),line.split()))
 
     def _update_metrics(self):
         """
             Update the metrics
-        :param metrics:
         :return:
         """
-
         self._update_stats()
-        for gm,cm,st in zip(self.metrics['Gauge'], self.metrics['Counter'], self.stats):
-            print
 
+        with self._lock:
+            for gm,cm,st in zip(self._metrics['Gauge'], self._metrics['Counter'], self._stats):
+                gm.set(st)
+                cm.inc(st)

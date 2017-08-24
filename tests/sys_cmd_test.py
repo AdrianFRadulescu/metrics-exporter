@@ -39,10 +39,8 @@ class SysCmdTestCase(unittest.TestCase):
 
     def test_start(self):
 
-
         time.sleep(self.cmd.get_sleep_time())
         self.assertTrue(self.cmd.isAlive(), 'thread {} could not be started'.format(self.cmd.getName()))
-        print 'Passed'
 
     def test_update_stats(self):
 
@@ -51,33 +49,49 @@ class SysCmdTestCase(unittest.TestCase):
         :return:
         """
 
+        t0 = time.gmtime()
         initial_stats = self.cmd.get_stats()
-
+        ti = time.gmtime()
         time.sleep(self.cmd.get_sleep_time())
         final_stats = self.cmd.get_stats()
+        tf = time.gmtime()
 
         try:
-            self.assertNotEqual(initial_stats, final_stats, 'States were not changed')
+            self.assertNotEqual(initial_stats, final_stats, 'Metrcis were equal')
         except AssertionError:
-            print 'time lap might not have been enough for significand change to occure'
+            self.assertLess(t0,ti, 'metrics were not updated')
+            self.assertLess(tf, ti, 'Second update was not done')
 
     def test_update_metrics(self):
 
-        initial_metrics = self.cmd.get_metrics()
-        time.sleep(self.cmd.sleep_time())
-        final_metrics = self.cmd.get_metrics()
+        t0 = time.time()
 
-        self.assertNotEqual(initial_metrics, final_metrics, )
+        initial_metrics = self.cmd.get_metrics()
+        time.sleep(4 * self.cmd.get_sleep_time())
+        ti = self.cmd.get_last_update_time()
+        print 'ti = {}'.format(ti)
+
+        final_metrics = self.cmd.get_metrics()
+        time.sleep(4 * self.cmd.get_sleep_time())
+        tf = self.cmd.get_last_update_time()
+        print 'tf = {}'.format(tf)
+
+        try:
+            self.assertNotEqual(initial_metrics, final_metrics, 'Metrcis were equal')
+        except AssertionError:
+            self.assertTrue(t0 < ti, 'err1')
+            self.assertLess(t0, ti, 'metrics were not updated')
+            self.assertLess(ti, tf, 'Second update was not done')
 
 
 class NetStatTestCase(SysCmdTestCase):
     """
-        Test the netstat Command
+        Test the netstat command execution
     """
 
     __test__ = True
     component = system_commands.NetStat
-    component_args = {'cmd':['netstat', '-w 10'], 'metrics' : darwin_metrics.NETSTAT_METRICS, 'sleep_time':10, 'name': 'Netstat'}
+    component_args = {'cmd':['netstat', '-w 2'], 'metrics': darwin_metrics.NETSTAT_METRICS, 'sleep_time': 2, 'name': 'Netstat'}
 
 
 class VMStatTestCase(SysCmdTestCase):
@@ -87,10 +101,19 @@ class VMStatTestCase(SysCmdTestCase):
 
     __test__ = True
     component = system_commands.VMStat
-    component_args = {'cmd': [vm_stat]}
+    component_args = {'cmd': ['vm_stat', '2'], 'metrics': darwin_metrics.VM_STAT_METRICS, 'sleep_time': 2, 'name': 'VMStat'}
 
 
-del (SysCmdTestCase)
+class IOStatTestCase(SysCmdTestCase):
+    """
+        Test the iostat command execution
+    """
+
+    __test__ = True
+    component = system_commands.IOStat
+    component_args = {'cmd': ['iostat', '-w 5'], 'metrics': darwin_metrics.IOSTAT_METRICS, 'sleep_time': 5, 'name': 'IOStat'}
+
+del SysCmdTestCase
 
 if __name__ == '__main__':
     unittest.main()
