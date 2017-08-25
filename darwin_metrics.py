@@ -89,13 +89,13 @@ for d in disks:
 
     DISK_TRANSFER_METRICS[d] = []
 
-    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_kilobytes_per_transfer', 'Current transfer average size')]
+    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfer_size_kilobytes', 'Current transfer average size')]
 
     DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfers_count', 'Current number of disk transfers per second')]
     DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfers_total', 'Total number of disk transfers made')]
 
-    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfer_size_kilobytes', 'Size of transfer')]
-    DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfer_size_bytes_total', 'Total number of transfered bytes')]
+    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_data_transfer_rate_megabytes_per_second', 'Size of transfer')]
+    DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfer_size_megabytes_total', 'Total number of transfered bytes')]
 
 
 # CPU
