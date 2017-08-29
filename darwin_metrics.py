@@ -7,69 +7,70 @@ import psutil
 
 # netstat metrics
 
-_INPUT_PACKETS_COUNT = Gauge('input_packets_count', 'Number of received packets')
-INPUT_ERRORS_COUNT = Gauge('input_error_count', 'Number of input errors')
+INPUT_PACKETS = Gauge('input_packets', 'Number of received packets')
+INPUT_ERRORS = Gauge('input_error', 'Number of input errors')
 INPUT_SIZE_BYTES = Gauge('input_size_bytes', 'The size of the input')
 
-INPUT_PACKETS_COUNT_TOTAL = Counter('input_packets_count_total', 'Total number of received packets')
-INPUT_ERRORS_COUNT_TOTAL = Counter('input_error_count_total', 'Total number of input errors')
+INPUT_PACKETS_TOTAL = Counter('input_packets_total', 'Total number of received packets')
+INPUT_ERRORS_TOTAL = Counter('input_error_total', 'Total number of input errors')
 INPUT_SIZE_BYTES_TOTAL = Counter('input_size_bytes_total', 'Total size of the input')
 
 
-OUTPUT_PACKETS_COUNT = Gauge('output_packets_count', 'Number of received packets')
-OUTPUT_ERRORS_COUNT = Gauge('output_error_count', 'Number of input errors')
+OUTPUT_PACKETS = Gauge('output_packets', 'Number of received packets')
+OUTPUT_ERRORS = Gauge('output_error', 'Number of input errors')
 OUTPUT_SIZE_BYTES = Gauge('output_size_bytes', 'The size of the input')
 
-OUTPUT_PACKETS_COUNT_TOTAL = Counter('output_packets_count_total', 'Total number of received packets')
-OUTPUT_ERRORS_COUNT_TOTAL = Counter('output_error_count_total', 'Total number of input errors')
+OUTPUT_PACKETS_TOTAL = Counter('output_packets_total', 'Total number of received packets')
+OUTPUT_ERRORS_TOTAL = Counter('output_error_total', 'Total number of input errors')
 OUTPUT_SIZE_BYTES_TOTAL = Counter('output_size_bytes_total', 'Total size of the input')
 
 NETSTAT_METRICS = {
 
     'Gauge': [
-        _INPUT_PACKETS_COUNT, INPUT_ERRORS_COUNT, INPUT_SIZE_BYTES,
-        OUTPUT_PACKETS_COUNT, OUTPUT_ERRORS_COUNT, OUTPUT_SIZE_BYTES
+        INPUT_PACKETS, INPUT_ERRORS, INPUT_SIZE_BYTES,
+        OUTPUT_PACKETS, OUTPUT_ERRORS, OUTPUT_SIZE_BYTES
     ],
 
     'Counter': [
-        INPUT_PACKETS_COUNT_TOTAL, INPUT_ERRORS_COUNT_TOTAL, INPUT_SIZE_BYTES_TOTAL,
-        OUTPUT_PACKETS_COUNT_TOTAL,OUTPUT_ERRORS_COUNT_TOTAL, OUTPUT_SIZE_BYTES_TOTAL
+        INPUT_PACKETS_TOTAL, INPUT_ERRORS_TOTAL, INPUT_SIZE_BYTES_TOTAL,
+        OUTPUT_PACKETS_TOTAL,OUTPUT_ERRORS_TOTAL, OUTPUT_SIZE_BYTES_TOTAL
     ]
 
 }
 
 # vm_stat metrics
-VM_FREE_PAGES_COUNT = Gauge('vm_free_pages_count', 'Number of free pages in Virtual Memory')
-VM_ACTIVE_PAGES_COUNT = Gauge('vm_active_pages_count', 'Number of active pages')
-VM_SPECUL_PAGES_COUNT = Gauge('vm_speculative_pages_count', 'Number of pages on the speculative list.')
-VM_INACTIVE_PAGES_COUNT = Gauge('vm_inactiv_pages_count', 'Number of inactive pages')
+VM_FREE_PAGES = Gauge('vm_free_pages', 'Number of free pages in Virtual Memory')
+VM_ACTIVE_PAGES = Gauge('vm_active_pages', 'Number of active pages')
+VM_SPECUL_PAGES = Gauge('vm_speculative_pages', 'Number of pages on the speculative list.')
+VM_INACTIVE_PAGES = Gauge('vm_inactiv_pages', 'Number of inactive pages')
 
-VM_THROTTLED_PAGES_COUNT = Gauge('VM_THROTTLED_PAGES_COUNT'.lower(), 'Number of pages on the throttled list (not wired but not pageable).')
-VM_WIRED_DOWN_PAGES_COUNT = Gauge('VM_WIRED_DOWN_PAGES_COUNT'.lower(), 'The total number of pages wired down.  That is, pages that cannot be paged out.')
+VM_THROTTLED_PAGES = Gauge('VM_THROTTLED_PAGES'.lower(), 'Number of pages on the throttled list (not wired but not pageable).')
+VM_WIRED_DOWN_PAGES = Gauge('VM_WIRED_DOWN_PAGES'.lower(), 'The total number of pages wired down.  That is, pages that cannot be paged out.')
 
-VM_PURGEABLE_PAGES_COUNT = Gauge('VM_PURGEABLE_PAGES_COUNT'.lower(), 'Number of purgeable pages')
+VM_PURGEABLE_PAGES = Gauge('VM_PURGEABLE_PAGES'.lower(), 'Number of purgeable pages')
 
-VM_TRANSLATION_FAULTS_COUNT = Counter('VM_TRANSLATION_FAULTS_COUNT'.lower(), 'Number of times the "vm_fault" routine has been called.')
-VM_COPY_ON_WRITE_COUNT = Counter('VM_COPY_ON_WRITE_COUNT'.lower(), 'Number of faults that caused a page to be copied')
+VM_TRANSLATION_FAULTS_TOTAL = Counter('VM_TRANSLATION_FAULTS'.lower(), 'Number of times the "vm_fault" routine has been called.')
+VM_COPY_ON_WRITE_COUNT = Counter('VM_COPY_ON_WRITE'.lower(), 'Number of faults that caused a page to be copied')
 
-VM_ZERO_FILLED_PAGES_COUNT = Counter('VM_ZERO_FILLED_PAGES_COUNT'.lower(), 'Total number of pages that have been zero-filled on demand.')
-VM_REACTIVE_PAGES_COUNT = Gauge('VM_REACTIVE_PAGES_COUNT'.lower(), '')
+VM_ZERO_FILLED_PAGES_TOTAL = Counter('VM_ZERO_FILLED_PAGES_TOTAL'.lower(), 'Total number of pages that have been zero-filled on demand.')
+VM_REACTIVE_PAGES = Gauge('VM_REACTIVE_PAGES'.lower(), '')
 
 VM_PURGED_PAGES_TOTAL = Counter('VM_PURGED_PAGES_TOTAL'.lower(), 'Total number of pages that have been purged')
 
 
 VM_STAT_METRICS = [
-    VM_FREE_PAGES_COUNT,
-    VM_ACTIVE_PAGES_COUNT,
-    VM_SPECUL_PAGES_COUNT,
-    VM_INACTIVE_PAGES_COUNT,
-    VM_THROTTLED_PAGES_COUNT,
-    VM_WIRED_DOWN_PAGES_COUNT,
-    VM_PURGEABLE_PAGES_COUNT,
-    VM_TRANSLATION_FAULTS_COUNT,
+
+    VM_FREE_PAGES,
+    VM_ACTIVE_PAGES,
+    VM_SPECUL_PAGES,
+    VM_INACTIVE_PAGES,
+    VM_THROTTLED_PAGES,
+    VM_WIRED_DOWN_PAGES,
+    VM_PURGEABLE_PAGES,
+    VM_TRANSLATION_FAULTS_TOTAL,
     VM_COPY_ON_WRITE_COUNT,
-    VM_ZERO_FILLED_PAGES_COUNT,
-    VM_REACTIVE_PAGES_COUNT,
+    VM_ZERO_FILLED_PAGES_TOTAL,
+    VM_REACTIVE_PAGES,
     VM_PURGED_PAGES_TOTAL
 ]
 
@@ -91,7 +92,7 @@ for d in disks:
 
     DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfer_size_kilobytes', 'Current transfer average size')]
 
-    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfers_count', 'Current number of disk transfers per second')]
+    DISK_TRANSFER_METRICS[d] += [Gauge(d + '_transfers', 'Current number of disk transfers per second')]
     DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfers_total', 'Total number of disk transfers made')]
 
     DISK_TRANSFER_METRICS[d] += [Gauge(d + '_data_transfer_rate_megabytes_per_second', 'Size of transfer')]

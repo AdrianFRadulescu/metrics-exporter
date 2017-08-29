@@ -63,7 +63,7 @@ class SysCmd(threading.Thread):
             return f(val[:-1]) * 1000 if val[-1] == 'K' else f(val)
 
         line = 'input'
-        while any(map(lambda w: w in line, ['input', 'packets', 'free', 'Virtual', 'disk', 'bytes', 'memory'])):
+        while any(map(lambda w: w in line, ['input', 'packets', 'free', 'Virtual', 'disk', 'bytes', 'memory', 'KB/t'])):
             line = self._output_stream.readline()
         self._stats = list(map(lambda x: __convert(x), line.split()))
 
@@ -141,7 +141,6 @@ class IOStat(SysCmd):
             # update cpu average load metrics
             for q in ['1m','5m','15m']:
                 self._metrics[2].labels(quantile=q).set(float(st.next()))
-
 
 
 class VMStat(SysCmd):
