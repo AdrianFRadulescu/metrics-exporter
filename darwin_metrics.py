@@ -99,18 +99,22 @@ for d in disks:
     DISK_TRANSFER_METRICS[d] += [Counter(d + '_transfer_size_megabytes_total', 'Total number of transfered bytes')]
 
 
-# CPU
-CPU_USAGE_RATIO = Gauge('cpu_usage_ratio', '% of cpu time in user, system and idle modes', ['mode'])
+# CPU TIMES
+CPU_TIMES_RATIO = Gauge('cpu_times_ratio', '% of cpu time in user, system and idle modes', ['core', 'mode'])
 
 # Load Average
-CPU_LOAD_AVERAGE = Gauge('cpu_load_average', 'CPU current load average on a 1m span', ['quantile'])
+CPU_LOAD_AVERAGE = Gauge('cpu_load_average', 'CPU current load average on a 1m span', ['span'])
+
+# CPU USAGE
+CPU_USAGE_RATIO = Gauge('cpu_usage_ratio', "% of the cpu in usage(on each individual core if specified)", ['core'])
 
 
 IOSTAT_METRICS = [
 
     DISK_TRANSFER_METRICS,
-    CPU_USAGE_RATIO,
-    CPU_LOAD_AVERAGE
+    CPU_TIMES_RATIO,
+    CPU_LOAD_AVERAGE,
+    CPU_USAGE_RATIO
 ]
 
 

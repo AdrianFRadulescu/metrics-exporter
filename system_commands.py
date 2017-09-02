@@ -136,11 +136,22 @@ class IOStat(SysCmd):
 
             # update cpu usage metrics
             for mode in ['us', 'sy', 'id']:
-                self._metrics[1].labels(mode=mode).set(float(st.next()))
+                self._metrics[1].labels(mode=mode, core='').set(float(st.next()))
+
+            # use psutil for a better accuracy on each core
+            for core_stats, core_id in zip(psutil.cpu_times_percent(interval=self._sleep_time, percpu=True), range(1, len(psutil.cpu_times_percent(interval=0, percpu=True)) + 1)):
+                for mode, index in zip(['us', 'sy', 'id'], [0, 2, 3]):
+                    self._metrics[1].labels(mode=mode, core=core_id).set(float(core_stats[index]))
 
             # update cpu average load metrics
-            for q in ['1m','5m','15m']:
-                self._metrics[2].labels(quantile=q).set(float(st.next()))
+            for q in ['1m', '5m', '15m']:
+                self._metrics[2].labels(span=q).set(float(st.next()))
+
+            # update the cpu usage metrics
+            self._metrics[3].labels(core='').set(psutil.cpu_percent())
+            for core_usage, core_id in  zip(psutil.cpu_percent(percpu=True),range(1, psutil.cpu_count() + 1)):
+
+                self._metrics[3].labels(core=core_id).set(core_usage)
 
 
 class VMStat(SysCmd):

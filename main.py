@@ -1,15 +1,13 @@
 from prometheus_client import start_http_server
 
 import darwin_metrics
+from sys import argv
 
 from system_commands import NetStat, VMStat, IOStat
 
-from pprint import pprint
-
-
 if __name__ == "__main__":
 
-    start_http_server(7800)
+    start_http_server(int(argv[1]))
 
     # use mo
 
@@ -22,7 +20,7 @@ if __name__ == "__main__":
     iostat.start()
 
     while True:
-        if raw_input() == 'stop':
+        if raw_input('>') == 'stop':
             break
 
     # signal monitoring threads to stop
